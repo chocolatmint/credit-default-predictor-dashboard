@@ -212,6 +212,16 @@ def generateScatterLimitAgePlot(status):
 
     return fig
 
+def generate_plots(status):
+    area_plot_gender_status = generateGenderPlot(status)
+    area_plot_age_status = generateAgePlot(status)
+    area_plot_edu_status = generateEducationPlot(status)
+    area_plot_marriage_status = generateMarriagePlot(status)
+    area_plot_limit_status = generateLimitPlot(status)
+    area_plot_scatter_status = generateScatterLimitAgePlot(status)
+
+    return (area_plot_gender_status, area_plot_age_status, area_plot_edu_status,
+            area_plot_marriage_status, area_plot_limit_status, area_plot_scatter_status)
 
 with st.container(border=True):
     infobox1, infobox2 = st.columns(2)
@@ -251,46 +261,43 @@ with st.container(border=True):
                 st.plotly_chart(area_plot_fig)
 
 with st.container(border=True):
+    status_option1 = "Gagal Bayar"
     status_option1 = st.radio(
     'Pilih Status Customer',
     ("Gagal Bayar", "Tidak Gagal Bayar"))
-    if st.button('Generate Plots'):
-        area_plot_gender_status = generateGenderPlot(status_option1)
-        area_plot_age_status = generateAgePlot(status_option1)
-        area_plot_edu_status = generateEducationPlot(status_option1)
-        area_plot_marriage_status = generateMarriagePlot(status_option1)
-        area_plot_limit_status = generateLimitPlot(status_option1)
-        area_plot_scatter_status = generateScatterLimitAgePlot(status_option1)
-
+    
+    area_plots = generate_plots(status_option1)
+    with st.container():
+        if area_plots[0] is not None:
+            st.markdown(f'#### Customer {status_option1}')
+    
     left_column, right_column = st.columns(2)
     with st.container(border=True):
-        if 'area_plot_fig_status' in locals():
-            st.write(f'Customer {status_option1}')
         
         with left_column:
-            if 'area_plot_gender_status' in locals():
-                st.plotly_chart(area_plot_gender_status)
+            if area_plots[0] is not None:
+                st.plotly_chart(area_plots[0])
 
         with right_column:
-            if 'area_plot_age_status' in locals():
-                 st.plotly_chart(area_plot_age_status)
+            if area_plots[1] is not None:
+                st.plotly_chart(area_plots[1])
 
     with st.container(border=True):
         with left_column:
-            if 'area_plot_edu_status' in locals():
-                st.plotly_chart(area_plot_edu_status)
+            if area_plots[2] is not None:
+                st.plotly_chart(area_plots[2])
 
         with right_column:
-            if 'area_plot_marriage_status' in locals():
-                st.plotly_chart(area_plot_marriage_status)
+            if area_plots[3] is not None:
+                st.plotly_chart(area_plots[3])
 
     with st.container(border=True):
         with left_column:
-            if 'area_plot_limit_status' in locals():
-                st.plotly_chart(area_plot_limit_status)
+            if area_plots[4] is not None:
+                st.plotly_chart(area_plots[4])
 
         with right_column:
-            if 'area_plot_scatter_status' in locals():
-                st.plotly_chart(area_plot_scatter_status)
+            if area_plots[5] is not None:
+                st.plotly_chart(area_plots[5])
                 
                 
