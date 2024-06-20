@@ -3,6 +3,11 @@ import pandas as pd
 import numpy as np
 import plotly.express as px
 
+st.set_page_config(
+    page_title="Credit Default Prediction",
+    page_icon="💹",
+)
+
 credit_default = st.session_state.data['credit_default']
 customer_default = credit_default[credit_default['default payment next month'] == 1]
 
@@ -77,7 +82,6 @@ def generatePlot(status, education, marriage):
             legend_title_text=None,
             legend=dict(orientation="h", yanchor="bottom", y=0.9, xanchor="right", x=1),
             margin=dict(l=20, r=20, t=40, b=20),
-            paper_bgcolor="LightSteelBlue",
             height=400,
             width=1300
         )
@@ -212,7 +216,7 @@ def generateScatterLimitAgePlot(status):
 
     return fig
 
-def generate_plots(status):
+def generatePlots(status):
     area_plot_gender_status = generateGenderPlot(status)
     area_plot_age_status = generateAgePlot(status)
     area_plot_edu_status = generateEducationPlot(status)
@@ -252,12 +256,12 @@ with st.container(border=True):
             marriage_option = st.selectbox(
             "Pilih Status Pernikahan",
             ("Menikah", "Lajang"))
-            if st.button('Generate Plot'):
-                area_plot_fig = generatePlot(status_option, education_option, marriage_option)
+            
+            area_plot_fig = generatePlot(status_option, education_option, marriage_option)
 
     with st.container(border=True):            
         with right_column:
-            if 'area_plot_fig' in locals():
+            if area_plot_fig is not None:
                 st.plotly_chart(area_plot_fig)
 
 with st.container(border=True):
@@ -266,7 +270,7 @@ with st.container(border=True):
     'Pilih Status Customer',
     ("Gagal Bayar", "Tidak Gagal Bayar"))
     
-    area_plots = generate_plots(status_option1)
+    area_plots = generatePlots(status_option1)
     with st.container():
         if area_plots[0] is not None:
             st.markdown(f'#### Customer {status_option1}')
