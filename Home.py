@@ -2,34 +2,30 @@ import streamlit as st
 from globals import init_session_state
 
 st.set_page_config(
-    page_title="Hello",
-    page_icon="👋",
+    page_title="Credit Default Prediction",
+    page_icon="🏠",
 )
 
-init_session_state()
+def main():
+    init_session_state()
+    st.title("Credit Default Prediction")
+    st.write(
+        "Welcome! This dashboard provides insights "
+        "into credit default predictions based on historical data."
+    )
+
+    st.markdown("### Dashboard Summary")
+    st.write(
+        "This dashboard allows you to explore and analyze credit default predictions. "
+        "It includes visualizations and summary statistics based on the dataset."
+    )
 
 
-st.write("# Welcome to Streamlit! 👋")
+    st.markdown("### Data Source")
+    st.write(
+        "The data used in this dashboard was taken from [Default of Credit Card Clients - UCI Machine Learning Repository](https://archive.ics.uci.edu/dataset/350/default+of+credit+card+clients). "
+        "It includes anonymized data related to borrowers' demographics, credit history, and loan details."
+    )
 
-st.sidebar.success("Select a demo above.")
-
-st.markdown(
-    """
-    Streamlit is an open-source app framework built specifically for
-    Machine Learning and Data Science projects.
-    **👈 Select a demo from the sidebar** to see some examples
-    of what Streamlit can do!
-    ### Want to learn more?
-    - Check out [streamlit.io](https://streamlit.io)
-    - Jump into our [documentation](https://docs.streamlit.io)
-    - Ask a question in our [community
-        forums](https://discuss.streamlit.io)
-    ### See more complex demos
-    - Use a neural net to [analyze the Udacity Self-driving Car Image
-        Dataset](https://github.com/streamlit/demo-self-driving)
-    - Explore a [New York City rideshare dataset](https://github.com/streamlit/demo-uber-nyc-pickups)
-    <html>
-    <br><br>
-    sohfiuadshfijsaeniufebux</html>
-""", unsafe_allow_html=True
-)
+if __name__ == "__main__":
+    main()
