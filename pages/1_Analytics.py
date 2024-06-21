@@ -11,6 +11,15 @@ st.set_page_config(
 credit_default = st.session_state.data['credit_default']
 customer_default = credit_default[credit_default['default payment next month'] == 1]
 
+month_mapping = {
+    'PAY_1': 'April 2005',
+    'PAY_2': 'May 2005',
+    'PAY_3': 'June 2005',
+    'PAY_4': 'July 2005',
+    'PAY_5': 'August 2005',
+    'PAY_6': 'September 2005'
+}
+
 def formatNumber(number):
     return "{:,}".format(number).replace(",", ".")
 
@@ -216,6 +225,92 @@ def generateScatterLimitAgePlot(status):
 
     return fig
 
+def generateOutstandingAmountMonthPlot():
+    outstanding_amounts = {
+        "April 2005": (credit_default["BILL_AMT1"] - credit_default["PAY_AMT1"]).sum(),
+        "May 2005": (credit_default["BILL_AMT2"] - credit_default["PAY_AMT2"]).sum(),
+        "June 2005": (credit_default["BILL_AMT3"] - credit_default["PAY_AMT3"]).sum(),
+        "July 2005": (credit_default["BILL_AMT4"] - credit_default["PAY_AMT4"]).sum(),
+        "August 2005": (credit_default["BILL_AMT5"] - credit_default["PAY_AMT5"]).sum(),
+        "September 2005": (credit_default["BILL_AMT6"] - credit_default["PAY_AMT6"]).sum(),
+    }
+
+    sorted_outstanding_amounts = dict(sorted(outstanding_amounts.items(), key=lambda item: item[1], reverse=True))
+
+    fig = px.bar(
+        x=list(sorted_outstanding_amounts.keys()),
+        y=list(sorted_outstanding_amounts.values()),
+        title='Outstanding Amounts Berdasarkan Bulan',
+        labels={'x': 'Bulan', 'y': 'Outstanding Amount ($NT)'}
+    ).update_layout(title=f'Outstanding Amounts Berdasarkan Bulan')
+
+    return fig
+
+def generateOutstandingCountMonthPlot():
+    outstanding_amt_apr = (credit_default["BILL_AMT1"] - credit_default["PAY_AMT1"] > 0).sum()
+    outstanding_amt_may = (credit_default["BILL_AMT2"] - credit_default["PAY_AMT2"] > 0).sum()
+    outstanding_amt_jun = (credit_default["BILL_AMT3"] - credit_default["PAY_AMT3"] > 0).sum()
+    outstanding_amt_jul = (credit_default["BILL_AMT4"] - credit_default["PAY_AMT4"] > 0).sum()
+    outstanding_amt_aug = (credit_default["BILL_AMT5"] - credit_default["PAY_AMT5"] > 0).sum()
+    outstanding_amt_sep = (credit_default["BILL_AMT6"] - credit_default["PAY_AMT6"] > 0).sum()
+
+    months = ["April 2005", "May 2005", "June 2005", "July 2005", "August 2005", "September 2005"]
+    df_outstanding = pd.DataFrame({
+        "Bulan": months,
+        "Jumlah Customer": [
+            outstanding_amt_apr, outstanding_amt_may, outstanding_amt_jun,
+            outstanding_amt_jul, outstanding_amt_aug, outstanding_amt_sep
+        ]
+    })
+
+    df_outstanding_sorted = df_outstanding.sort_values(by="Jumlah Customer", ascending=False)
+
+    fig = px.bar(
+        data_frame=df_outstanding_sorted,
+        x='Bulan',
+        y='Jumlah Customer',
+        title='Jumlah Customer Berdasarkan Outstanding Amount',
+        labels={'Jumlah Customer Berdasarkan Outstanding Amount': 'Jumlah Customer'}
+    ).update_layout(title=f'Jumlah Customer Berdasarkan Outstanding Amount')
+
+    return fig
+
+def generateScatterPlot():
+    limit_bal = credit_default['LIMIT_BAL']
+    target = credit_default['default payment next month']
+
+    color_map = {1: 'red', 
+                0: 'blue'} 
+
+    colors = target.map(color_map)
+    fig = px.scatter(
+        data_frame=credit_default, x=limit_bal, y=target, color=colors,
+        title='Scatter Plot of Credit Limit vs Default Payment Next Month',
+        labels={'LIMIT_BAL': 'Credit Limit (NT dollars)', 'default payment next month': 'Default Payment Next Month'},
+        hover_name=credit_default.index,
+        opacity=0.6 )\
+        .update_layout(
+            showlegend=False,
+            xaxis=dict(type='linear', title='Credit Limit (NT dollars)'),
+            yaxis=dict(type='linear', title='Default Payment Next Month (0 = No, 1 = Yes)')
+        )
+    
+    return fig
+
+def generateStatusPerMonth(data, selected_month):
+    selected_payment_status = f'PAY_{list(month_mapping.keys()).index(selected_month) + 1}'
+    
+    payment_status_counts = data[selected_payment_status].value_counts().sort_index()
+    data_long = payment_status_counts.reset_index()
+    data_long.columns = ['Payment Status', 'Count']
+
+    fig = px.bar(data_long, x='Payment Status', y='Count',
+                 title=f'Payment Status Counts for {month_mapping[selected_month]}',
+                 labels={'Payment Status': 'Payment Status', 'Count': 'Count'},
+                 color_discrete_sequence=['blue'])
+    
+    return fig
+
 def generatePlots(status):
     area_plot_gender_status = generateGenderPlot(status)
     area_plot_age_status = generateAgePlot(status)
@@ -304,4 +399,16 @@ with st.container(border=True):
             if area_plots[5] is not None:
                 st.plotly_chart(area_plots[5])
                 
-                
+
+with st.container(border=True):
+    st.plotly_chart(generateOutstandingAmountMonthPlot())
+    
+with st.container(border=True):
+    st.plotly_chart(generateOutstandingCountMonthPlot())
+    st.plotly_chart(generateScatterPlot())
+    
+    selected_month = st.selectbox('Select Month', options=list(month_mapping.keys()), format_func=lambda x: month_mapping[x])
+    
+    statusPlot = generateStatusPerMonth(credit_default, selected_month)
+    if statusPlot is not None:
+            st.plotly_chart(statusPlot)
