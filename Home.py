@@ -1,5 +1,4 @@
 import streamlit as st
-from globals import init_session_state
 
 st.set_page_config(
     page_title="Credit Default Prediction",
@@ -7,7 +6,6 @@ st.set_page_config(
 )
 
 def main():
-    init_session_state()
     st.title("Credit Default Prediction")
     st.write(
         "Welcome! This dashboard provides insights "
