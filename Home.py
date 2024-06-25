@@ -29,7 +29,7 @@ def main():
     st.markdown(f'#### Sumber Data')
     html_content2 = """
     <div style="text-align: justify;">
-        Projek ini akan menggunakan dataset yang diambil dari situs UCI dengan judul ["Default of Credit Card Clients"](https://archive.ics.uci.edu/dataset/350/default+of+credit+card+clients). Dataset ini diambil di sebuah lembaga keuangan di negara Taiwan pada tahun 2005.
+        Projek ini akan menggunakan dataset yang diambil dari situs UCI dengan judul "<a href="https://archive.ics.uci.edu/dataset/350/default+of+credit+card+clients">Default of Credit Card Clients</a>". Dataset ini berasal dari sebuah lembaga keuangan di negara Taiwan pada tahun 2005.
     </div>
     <div></div>
     """
