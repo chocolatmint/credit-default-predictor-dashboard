@@ -14,9 +14,13 @@ def main():
 
     st.header("Data Science Projects")
     st.markdown("Here are a few projects I've worked on:")
-    st.markdown("- Predictive modeling for customer churn using machine learning techniques")
-    st.markdown("- Exploratory data analysis on retail sales data to identify trends and insights")
-    st.markdown("- Building a recommendation system using collaborative filtering")
+    st.markdown("- [Finding the Best Model for Predicting Survival on the Titanic: A Comparison of Logistic Regression and K-nearest neighbor (k-NN)](https://rpubs.com/maudy_avianti/1171557)")
+    st.markdown("- [Finding the Best Model for Predicting Survival on the Titanic: A Comparison of Naive Bayes, Decision Tree, and Random Forest](https://rpubs.com/maudy_avianti/1171310)")
+    st.markdown("- [Titanic Survivability Analysis](https://rpubs.com/maudy_avianti/titanic_survivability_analysis)")
+    st.markdown("- [Amazon Books Analysis](https://rpubs.com/maudy_avianti/amazon_books_analysis)")   
+    st.markdown("- [World forest area dashboard](https://www.shinyapps.io/admin/#/application/11087290)")
+    st.markdown("- [Spotify daily chart dashboard](https://www.shinyapps.io/admin/#/application/11144834)")
+    st.markdown("- SMS spam/ham prediction in Bahasa Indonesia")
 
 
     st.header("Interests")

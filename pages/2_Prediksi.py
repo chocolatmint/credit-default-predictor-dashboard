@@ -7,6 +7,8 @@ import plotly.express as px
 import plotly.graph_objects as go
 from streamlit_shap import st_shap
 import shap
+import pandas as pd
+from sklearn.preprocessing import StandardScaler
 
 st.set_page_config(
     page_title="Credit Default Prediksi",
@@ -16,8 +18,10 @@ st.set_page_config(
 
 st.title("Prediksi")
 
-with open('nn_unscaled.pkl', 'rb') as file:
-    nn_unscaled = pickle.load(file)
+scaler = StandardScaler()
+
+with open('nn_scaled.pkl', 'rb') as file:
+    nn_scaled = pickle.load(file)
 
 def predictCustomer(gender_option, limit_text, age_text, education_option, pay1, bill_amt1, pay_amt1, pay2, bill_amt2, pay_amt2,
                     pay3, bill_amt3, pay_amt3, pay4, bill_amt4, pay_amt4, pay5, bill_amt5, pay_amt5, pay6, bill_amt6, pay_amt6):
@@ -58,12 +62,13 @@ def predictCustomer(gender_option, limit_text, age_text, education_option, pay1,
         'PAY_AMT_4': [pay_amt4]
     })
 
+    scaled_input_data = scaler.transform(input_data2)
     feature_names = list(input_data2.columns)
     
-    prediction = nn_unscaled.predict(input_data2)
+    prediction = nn_scaled.predict(scaled_input_data)
     risk_percentage = prediction[0][0] * 100
     
-    explainer = shap.Explainer(nn_unscaled, input_data, feature_names=feature_names)
+    explainer = shap.Explainer(nn_scaled, input_data, feature_names=feature_names)
     explanation = explainer(input_data)
 
     return risk_percentage, explanation
@@ -156,21 +161,21 @@ with st.container(border=True):
             bill_amt6 = st.number_input("Jumlah Tagihan 6 (dalam $NT)", min_value=None, max_value=None)
             pay_amt6 = st.number_input("Jumlah Pembayaran 6 (dalam $NT)", min_value=None, max_value=None)
                 
-    if st.button('Prediksi'):
-        risk_percentage, explanation = predictCustomer(gender_option, limit_text, age_text, education_option, pay1, bill_amt1, pay_amt1, pay2, bill_amt2, pay_amt2,
+if st.button('Prediksi'):
+    risk_percentage, explanation = predictCustomer(gender_option, limit_text, age_text, education_option, pay1, bill_amt1, pay_amt1, pay2, bill_amt2, pay_amt2,
                                                        pay3, bill_amt3, pay_amt3, pay4, bill_amt4, pay_amt4, pay5, bill_amt5, pay_amt5, pay6, bill_amt6, pay_amt6)
         
-        st.markdown('<h4 style="text-align: center;">Kemungkinan Default</h4>', unsafe_allow_html=True)
-        st.write(f"<h3 style='text-align: center;'>{risk_percentage:.2f}%</h3>", unsafe_allow_html=True)
+    st.markdown('<h4 style="text-align: center;">Kemungkinan Default</h4>', unsafe_allow_html=True)
+    st.write(f"<h3 style='text-align: center;'>{risk_percentage:.2f}%</h3>", unsafe_allow_html=True)
 
-        if risk_percentage >= 50:
+    if risk_percentage >= 50:
             gauge_color = 'red'
             text = "Customer kemungkinan besar gagal bayar di bulan berikutnya"
-        else:
+    else:
             gauge_color = 'green'
             text = "Customer kemungkinan besar tidak gagal bayar di bulan berikutnya"
 
-        fig = go.Figure(go.Indicator(
+    fig = go.Figure(go.Indicator(
             mode = "gauge+number",
             value = risk_percentage,
             domain = {'x': [0, 1], 'y': [0, 1]},
@@ -182,11 +187,11 @@ with st.container(border=True):
                 bordercolor="gray"
             )))
     
-        st.plotly_chart(fig)
-        st.write(f"<p style='text-align: center;'>{text}</p>", unsafe_allow_html=True)
+    st.plotly_chart(fig)
+    st.write(f"<h5 style='text-align: center;'>{text}</h5>", unsafe_allow_html=True)
         
-        st.markdown('<h4 style="text-align: center;">Penjelasan</h4>', unsafe_allow_html=True)
-        st.markdown('<div style="display: flex; justify-content: center;">', unsafe_allow_html=True)
-        st_shap(shap.plots.waterfall(explanation[0]), width=1000)
-        st.markdown('</div>', unsafe_allow_html=True)
+    st.markdown('<h4 style="text-align: center;">Penjelasan</h4>', unsafe_allow_html=True)
+    st.markdown('<div style="display: flex; justify-content: center;">', unsafe_allow_html=True)
+    st_shap(shap.plots.waterfall(explanation[0]), width=1200, height=500)
+    st.markdown('</div>', unsafe_allow_html=True)
 
