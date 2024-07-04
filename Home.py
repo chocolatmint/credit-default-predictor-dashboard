@@ -1,3 +1,4 @@
+import base64
 import streamlit as st
 
 st.set_page_config(
@@ -5,23 +6,27 @@ st.set_page_config(
     page_icon="🏠",
 )
 
+def get_base64_image(image_path):
+        with open(image_path, "rb") as image_file:
+            return base64.b64encode(image_file.read()).decode()
+
 def main():
     st.title("Prediksi Default Kartu Kredit")
 
-    st.image('images/cc.png', caption='Ilustrasi', width=int(0.25 * 1000))
+    st.markdown(
+        f"""
+        <div style="justify-content: center;">
+            <a href="{['github_url']}" target="_blank">
+                <img src="data:image/png;base64,{get_base64_image("images/cc.png")}" style="width:30%; height:20%">
+            </a>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
 
-    st.markdown(f'#### Latar Belakang')
     html_content = """
     <div style="text-align: justify;">
-        Kartu kredit adalah alat bayar yang populer digunakan oleh masyarakat di Indonesia. Keuntungan utama yang ditawarkan dari penggunaan kartu kredit adalah pembayaran yang dapat dilakukan secara dicicil, sehingga pengguna kartu kredit lebih mudah membeli barang tanpa harus membayar sekaligus.  Hal ini sangat membantu bagi mereka yang ingin membeli barang dengan harga yang lebih tinggi atau melakukan pembelian yang <i>urgent</i> namun tidak memiliki dana yang cukup. Dengan adanya kartu kredit, masyarakat dapat memperoleh barang-barang dengan cepat dan membayarnya secara bertahap.
-    </div>
-    <div></div>
-    <div style="text-align: justify;">
-        Seiring dengan meningkatnya penggunaan kartu kredit, kemungkinan risiko gagal bayar (default) juga semakin meningkat. Hal ini menjadi perhatian serius bagi lembaga keuangan penyedia kartu kredit. Ketika seorang customer gagal membayar tagihan kartu kreditnya secara tepat waktu, tidak hanya merusak reputasi yang bersangkutan, hal ini juga mengakibatkan kerugian finansial bagi lembaga keuangan pemberi pinjaman.
-    </div>
-    <div></div>
-    <div style="text-align: justify;">
-        Proses existing untuk memantau dan mengelola risiko gagal bayar sudah dimiliki oleh lembaga keuangan. Proses tersebut biasanya dilakukan oleh seorang kredit analis, dengan melakukan analisis manual terhadap data customer, seperti riwayat pembayaran, jumlah tagihan, dan faktor lainnya, untuk menilai risiko kredit secara langsung berdasarkan pengalaman dan pengetahuan mereka. Akan tetapi, analisis manual sering kali memiliki keterbatasan dalam menangani data yang banyak dan kompleksitas yang semakin meningkat. Analisis manual dapat menjadi proses yang memakan waktu dan rentan terhadap <i>human error</i>, terutama saat harus mengolah jumlah data yang besar dengan cepat. Analisis manual juga memerlukan waktu yang cukup lama karena dilakukan oleh manusia, berbeda dengan pemrosesan secara otomatis yang bisa dilakukan dengan cepat oleh komputer.
+        Kartu kredit memudahkan pembayaran dengan skema cicilan, membantu pembelian barang mahal atau mendesak. Namun, jika risiko gagal bayar meningkat dapat merugikan lembaga keuangan. Analisis manual kredit analis terhadap data customer untuk menilai risiko memiliki keterbatasan, rentan <i>human error</i>, dan memakan waktu. Diperlukan cara lain dalam melakukan analisis; salah satunya dengan menggunakan machine learning.
     </div>
     """
     st.markdown(html_content, unsafe_allow_html=True)
@@ -29,18 +34,16 @@ def main():
     st.markdown(f'#### Sumber Data')
     html_content2 = """
     <div style="text-align: justify;">
-        Projek ini akan menggunakan dataset yang diambil dari situs UCI dengan judul "<a href="https://archive.ics.uci.edu/dataset/350/default+of+credit+card+clients">Default of Credit Card Clients</a>". Dataset ini berasal dari sebuah lembaga keuangan di negara Taiwan pada tahun 2005.
+        Dataset diambil dari <a href="https://archive.ics.uci.edu/dataset/350/default+of+credit+card+clients">UCI</a>, berasal dari lembaga keuangan di Taiwan pada 2005.
     </div>
-    <div></div>
     """
     st.markdown(html_content2, unsafe_allow_html=True)
 
     st.markdown(f'#### Disclaimer')
     html_content3 = """
     <div style="text-align: justify;">
-        Kemungkinan terjadinya ketidak-relevanan hasil prediksi dapat terjadi dikarenakan dataset yang digunakan terlalu *outdated* dan berbeda dengan kondisi sosial-ekonomi yang ada di Indonesia, sehingga diperlukan analisis lebih lanjut jika pemodelan ini ingin diimplementasikan pada data kondisi masa kini di Indonesia.
+        Hasil prediksi mungkin kurang relevan karena dataset lama dan kondisi sosial-ekonomi berbeda, sehingga perlu analisis lebih lanjut untuk data kondisi Indonesia saat ini.
     </div>
-    <div></div>
     """
     st.markdown(html_content3, unsafe_allow_html=True)
 
