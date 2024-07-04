@@ -111,8 +111,8 @@ st.write(
 - [► Finding the Best Model for Predicting Survival on the Titanic: A Comparison of Naive Bayes, Decision Tree, and Random Forest](https://rpubs.com/maudy_avianti/1171310)
 - [► Titanic Survivability Analysis](https://rpubs.com/maudy_avianti/titanic_survivability_analysis)
 - [► Amazon Books Analysis](https://rpubs.com/maudy_avianti/amazon_books_analysis)
-- [► World forest area dashboard](https://www.shinyapps.io/admin/#/application/11087290)
-- [► Spotify daily chart dashboard](https://www.shinyapps.io/admin/#/application/11144834)
+- [► World forest area dashboard](https://maudyavianti.shinyapps.io/forest_analysis_1990-2021/)
+- [► Spotify daily chart dashboard](https://maudyavianti.shinyapps.io/spotify_daily_chart_analysis/)
 - ► SMS spam/ham prediction in Bahasa Indonesia (unpublished)
 """
 )
