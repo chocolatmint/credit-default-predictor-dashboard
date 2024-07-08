@@ -16,7 +16,7 @@ profile_pic = current_dir /"../images" / "avatar.jpeg"
 
 
 # --- GENERAL SETTINGS ---
-PAGE_TITLE = "About Me | Maudy N Avianti"
+PAGE_TITLE = "About"
 PAGE_ICON = ":wave:"
 NAME = "Maudy Avianti"
 DESCRIPTION = """
@@ -57,7 +57,7 @@ with col2:
     with cols_linkedin:
         st.markdown(
             f"""
-                <a href="{['linkedin_url']}" target="_blank">
+                <a href="{linkedin_url}" target="_blank">
                     <img src="data:image/png;base64,{linkedin_logo_base64}" style="width:100%; height:20%">
                 </a>
             """,
@@ -67,7 +67,7 @@ with col2:
     with cols_github:
         st.markdown(
             f"""
-                <a href="{['github_url']}" target="_blank">
+                <a href="{github_url}" target="_blank">
                     <img src="data:image/png;base64,{github_logo_base64}" style="width:90%; height:20%">
                 </a>
             """,

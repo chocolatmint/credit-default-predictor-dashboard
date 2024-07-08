@@ -5,7 +5,7 @@ import numpy as np
 import plotly.express as px
 
 st.set_page_config(
-    page_title="Credit Default Analisis",
+    page_title="Analisis Kredit Default",
     page_icon="💹",
     layout="wide",
 )
@@ -380,10 +380,9 @@ with st.container(border=True):
                 st.plotly_chart(area_plot_fig)
 
 with st.container(border=True):
-    st.markdown(f'##### Outstanding Amount')
+    st.markdown(f'##### Informasi Outstanding Amount')
     area_plots = generatePlots()
-    with st.container():
-        left_column, right_column = st.columns(2)
+    left_column, right_column = st.columns(2)
     with st.container(border=True):
         
         with left_column:
