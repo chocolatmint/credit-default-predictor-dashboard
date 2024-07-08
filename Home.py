@@ -2,7 +2,7 @@ import base64
 import streamlit as st
 
 st.set_page_config(
-    page_title="Credit Default Prediction",
+    page_title="Prediksi Kredit Default",
     page_icon="🏠",
 )
 
