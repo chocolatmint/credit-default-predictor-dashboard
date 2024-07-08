@@ -11,21 +11,47 @@ import pandas as pd
 from sklearn.preprocessing import StandardScaler
 
 st.set_page_config(
-    page_title="Credit Default Prediksi",
+    page_title="Prediksi Kredit Default",
     page_icon="⌛",
     layout="wide",
 )
 
 st.title("Prediksi")
 
-scaler = StandardScaler()
+# scaler = StandardScaler()
 
-with open('nn_scaled.pkl', 'rb') as file:
+with open('nn_scaled77%.pkl', 'rb') as file:
     nn_scaled = pickle.load(file)
 
-def predictCustomer(gender_option, limit_text, age_text, education_option, pay1, bill_amt1, pay_amt1, pay2, bill_amt2, pay_amt2,
-                    pay3, bill_amt3, pay_amt3, pay4, bill_amt4, pay_amt4, pay5, bill_amt5, pay_amt5, pay6, bill_amt6, pay_amt6):
+with open('skaler.pkl', 'rb') as file:
+    scaler = pickle.load(file)
+
+def predictCustomer(gender_option, limit_text, age_text, education_option, marriage_option, pay1, bill_amt1, pay_amt1, pay2, bill_amt2, 
+                    pay_amt2, pay3, bill_amt3, pay_amt3, pay4, bill_amt4, pay_amt4, pay5, bill_amt5, pay_amt5, pay6, bill_amt6, pay_amt6):
     
+    sex1 = gender_option == 'Pria'
+    sex2 = gender_option == 'Wanita'
+
+    if education_option == "Lainnya":
+        education = 0
+    elif education_option == "Sekolah Menengah":
+        education = 1
+    elif education_option == "Universitas":
+        education = 2
+    elif education_option == "Sekolah Pascasarjana":
+        education = 3
+
+    marriage0 = marriage1 = marriage2 = marriage3 = False
+
+    if marriage_option == 'Lainnya':
+        marriage0 = True
+    elif marriage_option == 'Menikah':
+        marriage1 = True
+    elif marriage_option == 'Lajang':
+        marriage2 = True
+    elif marriage_option == 'Bercerai':
+        marriage3 = True
+
     pay_mapping = {
         "Tidak ada transaksi": -2,
         "Lunas": -1,
@@ -47,20 +73,39 @@ def predictCustomer(gender_option, limit_text, age_text, education_option, pay1,
     pay5 = pay_mapping.get(pay5, 0)
     pay6 = pay_mapping.get(pay6, 0)
     
-    input_data = np.array([[pay6, pay5, pay4, pay3, pay2, pay1, limit_text, pay_amt6, pay_amt5, pay_amt4]])
+    input_data = np.array([[limit_text, education, age_text, pay1, pay2, pay3, pay4, pay5, pay6, bill_amt1, bill_amt2, bill_amt3, 
+                            bill_amt4, bill_amt5, bill_amt6, pay_amt1, pay_amt2, pay_amt3, pay_amt4, pay_amt5, pay_amt6, marriage0,
+                            marriage1, marriage2, marriage3, sex1, sex2]], dtype=np.float32)
 
     input_data2 = pd.DataFrame({
-        'PAY_6': [pay6],
-        'PAY_5': [pay5],
-        'PAY_4': [pay4],
-        'PAY_3': [pay3],
-        'PAY_2': [pay2],
-        'PAY_1': [pay1],
         'LIMIT_BAL': [limit_text],
-        'PAY_AMT_6': [pay_amt6],
-        'PAY_AMT_5': [pay_amt5],
-        'PAY_AMT_4': [pay_amt4]
-    })
+        'EDUCATION': [education],
+        'AGE': [age_text],
+        'PAY_1': [pay1],
+        'PAY_2': [pay2],
+        'PAY_3': [pay3],
+        'PAY_4': [pay4],
+        'PAY_5': [pay5],
+        'PAY_6': [pay6],
+        'BILL_AMT1': [bill_amt1],
+        'BILL_AMT2': [bill_amt2],
+        'BILL_AMT3': [bill_amt3],
+        'BILL_AMT4': [bill_amt4],
+        'BILL_AMT5': [bill_amt5],
+        'BILL_AMT6': [bill_amt6],
+        'PAY_AMT1': [pay_amt1],
+        'PAY_AMT2': [pay_amt2],
+        'PAY_AMT3': [pay_amt3],
+        'PAY_AMT4': [pay_amt4],
+        'PAY_AMT5': [pay_amt5],
+        'PAY_AMT6': [pay_amt6],
+        'MARRIAGE_0': [marriage0],
+        'MARRIAGE_1': [marriage1],
+        'MARRIAGE_2': [marriage2],
+        'MARRIAGE_3': [marriage3],
+        'SEX_1': [sex1],
+        'SEX_2': [sex2],
+    }).astype(float)
 
     scaled_input_data = scaler.transform(input_data2)
     feature_names = list(input_data2.columns)
@@ -69,14 +114,14 @@ def predictCustomer(gender_option, limit_text, age_text, education_option, pay1,
     risk_percentage = prediction[0][0] * 100
     
     explainer = shap.Explainer(nn_scaled, input_data, feature_names=feature_names)
-    explanation = explainer(input_data)
+    explanation = explainer(scaled_input_data)
 
     return risk_percentage, explanation
 
 
 with st.container(border=True):
     st.markdown(f'##### Isi informasi di bawah untuk memprediksi kemungkinan default customer:')
-    gender_col, limit_col, age_col, edu_col = st.columns(4)
+    gender_col, limit_col, age_col, edu_col, marriage_col = st.columns(5)
     with gender_col:
         gender_option = st.radio(
             'Pilih Jenis Kelamin',
@@ -92,6 +137,10 @@ with st.container(border=True):
         education_option = st.selectbox(
         "Pilih Tingkat Pendidikan",
         ("Lainnya", "Sekolah Menengah", "Universitas", "Sekolah Pascasarjana"))
+    
+    with marriage_col:
+        marriage_option = st.selectbox("Pilih Status Pernikahan",
+        ('Lainnya', 'Menikah', 'Lajang', 'Bercerai'))
 
     with st.container(border=True):
         col1, col2 = st.columns(2)
@@ -162,8 +211,8 @@ with st.container(border=True):
             pay_amt6 = st.number_input("Jumlah Pembayaran 6 (dalam $NT)", min_value=None, max_value=None)
                 
 if st.button('Prediksi'):
-    risk_percentage, explanation = predictCustomer(gender_option, limit_text, age_text, education_option, pay1, bill_amt1, pay_amt1, pay2, bill_amt2, pay_amt2,
-                                                       pay3, bill_amt3, pay_amt3, pay4, bill_amt4, pay_amt4, pay5, bill_amt5, pay_amt5, pay6, bill_amt6, pay_amt6)
+    risk_percentage, explanation = predictCustomer(gender_option, limit_text, age_text, education_option, marriage_option, pay1, bill_amt1, pay_amt1, pay2, bill_amt2, 
+                                                    pay_amt2, pay3, bill_amt3, pay_amt3, pay4, bill_amt4, pay_amt4, pay5, bill_amt5, pay_amt5, pay6, bill_amt6, pay_amt6)
         
     st.markdown('<h4 style="text-align: center;">Kemungkinan Default</h4>', unsafe_allow_html=True)
     st.write(f"<h3 style='text-align: center;'>{risk_percentage:.2f}%</h3>", unsafe_allow_html=True)
@@ -193,5 +242,6 @@ if st.button('Prediksi'):
     st.markdown('<h4 style="text-align: center;">Penjelasan</h4>', unsafe_allow_html=True)
     st.markdown('<div style="display: flex; justify-content: center;">', unsafe_allow_html=True)
     st_shap(shap.plots.waterfall(explanation[0]), width=1200, height=500)
+    
     st.markdown('</div>', unsafe_allow_html=True)
 
