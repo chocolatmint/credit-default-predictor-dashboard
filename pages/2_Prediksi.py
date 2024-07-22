@@ -8,7 +8,7 @@ import plotly.graph_objects as go
 from streamlit_shap import st_shap
 import shap
 import pandas as pd
-from sklearn.preprocessing import StandardScaler
+
 
 st.set_page_config(
     page_title="Prediksi Kredit Default",
@@ -119,6 +119,19 @@ def predictCustomer(gender_option, limit_text, age_text, education_option, marri
     return risk_percentage, explanation
 
 
+with st.expander('Klik di sini untuk mengetahui cara mengisi formulir di bawah:'):
+    st.info("""
+        **Cara Pengisian Formulir:**
+
+        1. **Pilih Jenis Kelamin**: Pilih "Pria" atau "Wanita".
+        2. **Masukkan Kredit Limit**: Isi dengan nilai kredit limit (maksimal 999999).
+        3. **Masukkan Usia**: Isi dengan usia Anda (antara 20 hingga 99 tahun).
+        4. **Pilih Tingkat Pendidikan**: Pilih salah satu dari "Lainnya", "Sekolah Menengah", "Universitas", atau "Sekolah Pascasarjana".
+        5. **Pilih Status Pernikahan**: Pilih salah satu dari "Lainnya", "Menikah", "Lajang", atau "Bercerai".
+        6. **Isi Status Pembayaran dan Jumlah**: Untuk setiap kolom, pilih status pembayaran dan isi jumlah tagihan serta jumlah pembayaran dalam $NT.
+        7. **Klik Tombol 'Prediksi'**: Setelah mengisi semua data, klik tombol "Prediksi" untuk melihat kemungkinan default customer.
+    """)
+
 with st.container(border=True):
     st.markdown(f'##### Isi informasi di bawah untuk memprediksi kemungkinan default customer:')
     gender_col, limit_col, age_col, edu_col, marriage_col = st.columns(5)
@@ -128,10 +141,10 @@ with st.container(border=True):
             ("Pria", "Wanita"))
              
     with limit_col:
-        limit_text = st.number_input("Kredit Limit (dalam $NT)", min_value=0, max_value=None)
+        limit_text = st.number_input("Kredit Limit (dalam $NT)", min_value=0, max_value=999999)
     
     with age_col:
-        age_text = st.number_input("Usia", min_value=0, max_value=None)
+        age_text = st.number_input("Usia", min_value=20, max_value=99)
 
     with edu_col:
         education_option = st.selectbox(
@@ -218,11 +231,11 @@ if st.button('Prediksi'):
     st.write(f"<h3 style='text-align: center;'>{risk_percentage:.2f}%</h3>", unsafe_allow_html=True)
 
     if risk_percentage >= 50:
-            gauge_color = 'red'
-            text = "Customer kemungkinan besar gagal bayar di bulan berikutnya"
+        gauge_color = 'red'
+        text = "Customer kemungkinan besar gagal bayar di bulan berikutnya"
     else:
-            gauge_color = 'green'
-            text = "Customer kemungkinan besar tidak gagal bayar di bulan berikutnya"
+        gauge_color = 'green'
+        text = "Customer kemungkinan besar tidak gagal bayar di bulan berikutnya"
 
     fig = go.Figure(go.Indicator(
             mode = "gauge+number",
@@ -240,8 +253,7 @@ if st.button('Prediksi'):
     st.write(f"<h5 style='text-align: center;'>{text}</h5>", unsafe_allow_html=True)
         
     st.markdown('<h4 style="text-align: center;">Penjelasan</h4>', unsafe_allow_html=True)
-    st.markdown('<div style="display: flex; justify-content: center;">', unsafe_allow_html=True)
-    st_shap(shap.plots.waterfall(explanation[0]), width=1200, height=500)
-    
-    st.markdown('</div>', unsafe_allow_html=True)
-
+    with st.expander("Lihat Penjelasan Lengkap"):
+        st.markdown('<div style="display: flex; justify-content: center;">', unsafe_allow_html=True)
+        st_shap(shap.plots.waterfall(explanation[0]), width=1200, height=500)
+        st.markdown('</div>', unsafe_allow_html=True)

@@ -1,5 +1,4 @@
 from pathlib import Path
-
 import streamlit as st
 import base64
 from PIL import Image
@@ -16,7 +15,7 @@ profile_pic = current_dir /"../images" / "avatar.jpeg"
 
 
 # --- GENERAL SETTINGS ---
-PAGE_TITLE = "About"
+PAGE_TITLE = "About Me"
 PAGE_ICON = ":wave:"
 NAME = "Maudy Avianti"
 DESCRIPTION = """
@@ -31,8 +30,6 @@ github_logo_base64 = get_base64_image(github_logo_path)
 
 linkedin_url = "https://www.linkedin.com/in/maudy-avianti/"
 github_url = "https://github.com/chocolatmint"
-
-
 
 st.set_page_config(page_title=PAGE_TITLE, page_icon=PAGE_ICON)
 
@@ -116,8 +113,6 @@ st.write(
 - ► SMS spam/ham prediction in Bahasa Indonesia (unpublished)
 """
 )
-
-
 
 with st.container():
     st.markdown(

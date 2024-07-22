@@ -5,7 +5,7 @@ import numpy as np
 import plotly.express as px
 
 st.set_page_config(
-    page_title="Analisis Kredit Default",
+    page_title="Analisis Dataset Kredit Default",
     page_icon="💹",
     layout="wide",
 )
@@ -18,15 +18,15 @@ customer_default = credit_default[credit_default['default payment next month'] =
 
 month_mapping = {
     'PAY_1': 'April 2005',
-    'PAY_2': 'May 2005',
-    'PAY_3': 'June 2005',
-    'PAY_4': 'July 2005',
-    'PAY_5': 'August 2005',
+    'PAY_2': 'Mei 2005',
+    'PAY_3': 'Juni 2005',
+    'PAY_4': 'Juli 2005',
+    'PAY_5': 'Agustus 2005',
     'PAY_6': 'September 2005'
 }
 
-color_map = {'Default': 'red', 
-            'Tidak Default': 'green'}
+color_map = {'Default': '#5a9bd4', 
+            'Tidak Default': '#104e8b'}
 
 def formatNumber(number):
     return "{:,}".format(number).replace(",", ".")
@@ -95,7 +95,7 @@ def generatePlot(status, education, marriage):
                   'AGE': 'Usia', 'Count': 'Jumlah Customer',
                   'SEX': 'Jenis Kelamin', 'EDUCATION': 'Pendidikan', 'MARRIAGE' : 'Status Pernikahan'
               },
-              color_discrete_map={'Pria': 'blue', 'Wanita': 'pink'})\
+              color_discrete_map={'Pria': '#1f77b4', 'Wanita': '#ff85c0'})\
         .for_each_annotation(lambda a: a.update(text=a.text.replace("EDUCATION=", "").replace("MARRIAGE=", "")))\
         .update_layout(
             title=f'Persona Customer {status}',
@@ -146,7 +146,7 @@ def generateAgePlot():
     credit_default_copy = credit_default.copy()
 
     age_bins = [20, 30, 40, 50, 60, 70, 80, 90]
-    age_labels = ['20an', '30an', '40an', '50an', '60an', '70an', '80an']
+    age_labels = ['20-29 tahun', '30-39 tahun', '40-49 tahun', '50-59 tahun', '60-69 tahun', '70-79 tahun', '80-89 tahun']
     credit_default_copy['AGE_GROUP'] = pd.cut(credit_default_copy['AGE'], bins=age_bins, labels=age_labels)
 
     for i in range(1, 7):
@@ -157,7 +157,7 @@ def generateAgePlot():
     
     fig = px.bar(sum_of_averages, x='AGE_GROUP', y='Sum_Average_Outstanding_Amount',
                  labels={'AGE_GROUP': 'Kelompok Usia', 'Sum_Average_Outstanding_Amount': 'Rata-rata Outstanding Amount'},
-                 title='Berdasarkan Kelompok Usia')
+                 title='Berdasarkan Kelompok Usia (per 10 tahun)')
 
     return fig
 
@@ -181,8 +181,8 @@ def generateEducationPlot():
     
     fig = px.bar(sum_of_averages, x='EDUCATION', y='Sum_Average_Outstanding_Amount',
                  labels={'EDUCATION': 'Tingkat Pendidikan', 'Sum_Average_Outstanding_Amount': 'Rata-rata Outstanding Amount'},
-                 title='Berdasarkan Tingkat Pendidikan (per 10 tahun)')
-
+                 title='Berdasarkan Tingkat Pendidikan',
+                 category_orders={'MARRIAGE': ['Lainnya', 'Sekolah menengah', 'Universitas', 'Sekolah pascasarjana']})
     return fig
 
 def generateMarriagePlot():
@@ -206,7 +206,8 @@ def generateMarriagePlot():
     
     fig = px.bar(sum_of_averages, x='MARRIAGE', y='Sum_Average_Outstanding_Amount',
                  labels={'MARRIAGE': 'Status Pernikahan', 'Sum_Average_Outstanding_Amount': 'Rata-rata Outstanding Amount'},
-                 title='Berdasarkan Status Pernikahan')
+                 title='Berdasarkan Status Pernikahan',
+                 category_orders={'MARRIAGE': ['Lainnya', 'Lajang', 'Menikah', 'Bercerai']})
 
     return fig
 
@@ -233,19 +234,20 @@ def generateLimitPlot():
 def generateOutstandingAmountMonthPlot():
     outstanding_amounts = {
         "April 2005": (credit_default["BILL_AMT1"] - credit_default["PAY_AMT1"]).sum(),
-        "May 2005": (credit_default["BILL_AMT2"] - credit_default["PAY_AMT2"]).sum(),
-        "June 2005": (credit_default["BILL_AMT3"] - credit_default["PAY_AMT3"]).sum(),
-        "July 2005": (credit_default["BILL_AMT4"] - credit_default["PAY_AMT4"]).sum(),
-        "August 2005": (credit_default["BILL_AMT5"] - credit_default["PAY_AMT5"]).sum(),
+        "Mei 2005": (credit_default["BILL_AMT2"] - credit_default["PAY_AMT2"]).sum(),
+        "Juni 2005": (credit_default["BILL_AMT3"] - credit_default["PAY_AMT3"]).sum(),
+        "Juli 2005": (credit_default["BILL_AMT4"] - credit_default["PAY_AMT4"]).sum(),
+        "Agustus 2005": (credit_default["BILL_AMT5"] - credit_default["PAY_AMT5"]).sum(),
         "September 2005": (credit_default["BILL_AMT6"] - credit_default["PAY_AMT6"]).sum(),
     }
 
-    fig = px.bar(
+    fig = px.line(
         x=list(outstanding_amounts.keys()),
         y=list(outstanding_amounts.values()),
         title='Outstanding Amount Berdasarkan Bulan',
-        labels={'x': 'Bulan', 'y': 'Outstanding Amount ($NT)'}
-    ).update_layout(title=f'Outstanding Amount Berdasarkan Bulan')
+        labels={'x': 'Bulan', 'y': 'Outstanding Amount ($NT)'},
+        markers=True
+    ).update_layout(title='Outstanding Amount Berdasarkan Bulan')
 
     return fig
 
@@ -257,7 +259,7 @@ def generateOutstandingCountMonthPlot():
     outstanding_amt_aug = (credit_default["BILL_AMT5"] - credit_default["PAY_AMT5"] > 0).sum()
     outstanding_amt_sep = (credit_default["BILL_AMT6"] - credit_default["PAY_AMT6"] > 0).sum()
 
-    months = ["April 2005", "May 2005", "June 2005", "July 2005", "August 2005", "September 2005"]
+    months = ["April 2005", "Mei 2005", "Juni 2005", "Juli 2005", "Agustus 2005", "September 2005"]
     df_outstanding = pd.DataFrame({
         "Bulan": months,
         "Jumlah Customer": [
@@ -266,37 +268,14 @@ def generateOutstandingCountMonthPlot():
         ]
     })
 
-    fig = px.bar(
+    fig = px.line(
         data_frame=df_outstanding,
         x='Bulan',
         y='Jumlah Customer',
         title='Jumlah Customer Berdasarkan Outstanding Amount',
-        labels={'Jumlah Customer Berdasarkan Outstanding Amount': 'Jumlah Customer'}
+        labels={'Jumlah Customer Berdasarkan Outstanding Amount': 'Jumlah Customer'},
+        markers=True,
     ).update_layout(title=f'Jumlah Customer Berdasarkan Outstanding Amount')
-
-    return fig
-
-def generateBoxPlot():
-    credit_default_copy = credit_default.copy()
-    credit_default_copy['default payment next month'] = credit_default_copy['default payment next month'].astype(str)
-
-    credit_default_copy['default payment next month'] = credit_default_copy['default payment next month'].replace({'0': 'Tidak Default', '1': 'Default'})
-
-    limit_bal = credit_default_copy['LIMIT_BAL']
-    target = credit_default_copy['default payment next month']
-
-    fig = px.box(
-        data_frame=credit_default_copy, x=target, y=limit_bal, color=target, color_discrete_map=color_map,
-        title='Hubungan Kredit Limit dan Status Pembayaran',
-        labels={'LIMIT_BAL': 'Kredit Limit (dalam $NT)', 'default payment next month': 'Status'},
-        category_orders={'default payment next month': ['Tidak Default', 'Default']},
-    ).update_traces(
-        hoverinfo='x+y'
-    ).update_layout(
-        showlegend=False,
-        xaxis=dict(type='category', title='Status Pembayaran'),
-        yaxis=dict(type='linear', title='Kredit Limit (dalam $NT)')
-    )
 
     return fig
 
@@ -379,40 +358,57 @@ with st.container(border=True):
             if area_plot_fig is not None:
                 st.plotly_chart(area_plot_fig)
 
+plot_options = [
+    'Jenis Kelamin', 
+    'Kelompok Usia', 
+    'Tingkat Pendidikan', 
+    'Status Pernikahan', 
+    'Kredit Limit'
+]
+
 with st.container(border=True):
-    st.markdown(f'##### Informasi Outstanding Amount')
-    area_plots = generatePlots()
-    left_column, right_column = st.columns(2)
-    with st.container(border=True):
-        
-        with left_column:
-            if area_plots[0] is not None:
-                st.plotly_chart(area_plots[0])
+    st.markdown(f'##### Pilih kategori di bawah untuk melihat informasi outstanding amount:')
+    selected_plot = st.selectbox('Pilih Kategori:', plot_options)
+    selected_index = plot_options.index(selected_plot)
 
-        with right_column:
-            if area_plots[1] is not None:
-                st.plotly_chart(area_plots[1])
-
-    with st.container(border=True):
-        with left_column:
-            if area_plots[2] is not None:
-                st.plotly_chart(area_plots[2])
-
-        with right_column:
-            if area_plots[3] is not None:
-                st.plotly_chart(area_plots[3])
-
-    if area_plots[4] is not None:
-        st.plotly_chart(area_plots[4])
+    st.plotly_chart(generatePlots()[selected_index])
                 
 with st.container(border=True):
     st.plotly_chart(generateOutstandingAmountMonthPlot())
     
 with st.container(border=True):
     st.plotly_chart(generateOutstandingCountMonthPlot())
-    
-with st.container(border=True):    
-    st.plotly_chart(generateBoxPlot())
+
+with st.container(border=True):
+    st.markdown(f'## Perbandingan Kredit Limit Berdasarkan Status Pembayaran')
+
+    st.markdown(f'#### Tidak Default')
+    with st.container(border=True):
+        infobox1, infobox2, infobox3, infobox4, infobox5 = st.columns(5)
+        with infobox1:
+            st.metric(label="Min", value=10000, help = 'dalam NTD$') 
+        with infobox2:
+            st.metric(label="Max", value=1000000, help = 'dalam NTD$')
+        with infobox3:
+            st.metric(label="Q1", value=70000, help = 'dalam NTD$')
+        with infobox4:
+            st.metric(label="Median/Q2", value=150000, help = 'dalam NTD$')
+        with infobox5:
+            st.metric(label="Q3", value=250000, help = 'dalam NTD$')
+
+    st.markdown(f'#### Default')
+    with st.container(border=True):
+        infobox1, infobox2, infobox3, infobox4, infobox5 = st.columns(5)
+        with infobox1:
+            st.metric(label="Min", value=10000, help = 'dalam NTD$') 
+        with infobox2:
+            st.metric(label="Max", value=740000, help = 'dalam NTD$')
+        with infobox3:
+            st.metric(label="Q1", value=50000, help = 'dalam NTD$')
+        with infobox4:
+            st.metric(label="Median/Q2", value=90000, help = 'dalam NTD$')
+        with infobox5:
+            st.metric(label="Q3", value=200000, help = 'dalam NTD$')
 
 with st.container(border=True):
     st.markdown(f'##### Pilih pilihan bulan di bawah untuk melihat statistik status pembayaran:')
